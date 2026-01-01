@@ -13,8 +13,11 @@ public struct QuickLookPreview: UIViewControllerRepresentable {
         self.urls = urls
     }
     
-    public func makeUIViewController(context: Context) -> UIViewController {
-        PreviewViewController(remoteURLs: urls)
+     public func makeUIViewController(context: Context) -> UIViewController {
+        let previewVC = PreviewViewController(remoteURLs: urls)
+        
+        let navController = UINavigationController(rootViewController: previewVC)
+        return navController
     }
 
     public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
