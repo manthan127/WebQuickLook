@@ -30,6 +30,15 @@ public class PreviewViewController: QLPreviewController {
             self.localFileURLs = await DownloadHandler.shared.downloadFiles(from: remoteURLs)
             self.reloadData()
         }
+    
+        if self.navigationItem.rightBarButtonItem == nil {
+            let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissPreview))
+            self.navigationItem.rightBarButtonItem = doneButton
+        }
+    }
+    
+    @objc func dismissPreview() {
+        self.dismiss(animated: true, completion: nil)
     }
 }
 
