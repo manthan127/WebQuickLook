@@ -7,7 +7,7 @@
 
 import Foundation
 
-actor RunningAPITraker {
+actor RunningAPITracker {
     var dic: [URL: Task<URL?, Never>] = [:]
     
     subscript(_ key: URL) -> Task<URL?, Never>? {
@@ -25,8 +25,10 @@ public class DownloadHandler {
     }
     public static let shared = DownloadHandler()
     
-    private var runningAPITraker = RunningAPITraker()
+    private var runningAPITracker = RunningAPITracker()
     private let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
+    
+    private lazy var session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
     
     func Download(_ remoteURL: URL) async -> URL? {
         let fileName = remoteURL.lastPathComponent
@@ -37,7 +39,7 @@ public class DownloadHandler {
         }
         
         do {
-            let (data, _) = try await URLSession.shared.data(from: remoteURL)
+            let (data, _) = try await session.data(from: remoteURL)
             try data.write(to: localURL)
             return localURL
         } catch {
@@ -47,18 +49,28 @@ public class DownloadHandler {
 }
 
 
+final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
+    func urlSession(
+        _ session: URLSession,
+        dataTask: URLSessionDataTask,
+        didReceive response: URLResponse
+    ) async -> URLSession.ResponseDisposition {
+        response.expectedContentLength > WebQuickLook.maxFileSize ? .cancel : .allow
+    }
+}
+
 public extension DownloadHandler {
     func downloadFiles(from urls: [URL]) async -> [URL?] {
         // used array of task instead of TaskGroup to keep responses in correct order
         var tasks: [Task<URL?, Never>] = []
         for url in urls {
-            if let runningTask = await runningAPITraker[url] {
+            if let runningTask = await runningAPITracker[url] {
                 tasks.append(runningTask)
                 continue
             }
             let task = Task { await Download(url) }
             tasks.append(task)
-            await runningAPITraker.set(task, for: url)
+            await runningAPITracker.set(task, for: url)
         }
         
         var urls: [URL?] = []
