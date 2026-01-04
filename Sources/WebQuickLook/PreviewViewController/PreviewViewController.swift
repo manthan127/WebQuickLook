@@ -10,8 +10,8 @@ import QuickLook
 
 public class PreviewViewController: QLPreviewController {
 
-    private var remoteURLs: [URL] = []
-    private var localFileURLs: [URL?] = []
+    internal var remoteURLs: [URL] = []
+    internal var localFileURLs: [Result<URL, any Error>] = []
     
     public init(remoteURLs: [URL]) {
         self.remoteURLs = remoteURLs
@@ -25,6 +25,7 @@ public class PreviewViewController: QLPreviewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         dataSource = self
+        delegate = self
         
         Task {
             self.localFileURLs = await DownloadHandler.shared.downloadFiles(from: remoteURLs)
@@ -42,23 +43,5 @@ public class PreviewViewController: QLPreviewController {
     }
 }
 
-// MARK: - QLPreviewControllerDataSource
-extension PreviewViewController: QLPreviewControllerDataSource {
-    public func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
-        return remoteURLs.count
-    }
-
-    public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-        // If file failed to download, show placeholder or error
-        if index < localFileURLs.count, let url = localFileURLs[index] {
-            return url as QLPreviewItem
-        } else {
-            // Use a local "error.txt" or placeholder PDF if desired
-            let errorURL = FileManager.default.temporaryDirectory.appendingPathComponent("error.txt")
-            if !FileManager.default.fileExists(atPath: errorURL.path) {
-                try? "Failed to load file.".write(to: errorURL, atomically: true, encoding: .utf8)
-            }
-            return errorURL as QLPreviewItem
-        }
-    }
-}
+// TODO: - implement delegate methodes
+extension PreviewViewController: QLPreviewControllerDelegate {}

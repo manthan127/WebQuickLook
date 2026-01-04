@@ -26,6 +26,13 @@ import Foundation
 
 // - make swiftUI like function for users to use
 
+// - canccel api call when quick look is dismissed (with/without reumeData)
+
 enum WebQuickLook {
     static var maxFileSize: Int64 = 10 * 1024 * 1024
+    
+    static var downloading: URL?
+    static var downloadFailed: URL?
+    static var invalidFileType: URL?
+    static var bigFile: URL?
 }

@@ -7,18 +7,6 @@
 
 import Foundation
 
-actor RunningAPITracker {
-    var dic: [URL: Task<URL?, Never>] = [:]
-    
-    subscript(_ key: URL) -> Task<URL?, Never>? {
-        dic[key]
-    }
-    
-    func set(_ newValue: Task<URL?, Never>, for key: URL) {
-        dic[key] = newValue
-    }
-}
-
 public class DownloadHandler {
     private init() {
         try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
@@ -30,7 +18,7 @@ public class DownloadHandler {
     
     private lazy var session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
     
-    func Download(_ remoteURL: URL) async -> URL? {
+    func Download(_ remoteURL: URL) async throws -> URL {
         let fileName = remoteURL.lastPathComponent
         let localURL = directoryURL.appendingPathComponent(fileName)
         
@@ -38,13 +26,9 @@ public class DownloadHandler {
             return localURL
         }
         
-        do {
-            let (data, _) = try await session.data(from: remoteURL)
-            try data.write(to: localURL)
-            return localURL
-        } catch {
-            return nil
-        }
+        let (data, _) = try await session.data(from: remoteURL)
+        try data.write(to: localURL)
+        return localURL
     }
 }
 
@@ -60,22 +44,26 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
 }
 
 public extension DownloadHandler {
-    func downloadFiles(from urls: [URL]) async -> [URL?] {
+    func downloadFiles(from urls: [URL]) async -> [Result<URL, Error>] {
         // used array of task instead of TaskGroup to keep responses in correct order
-        var tasks: [Task<URL?, Never>] = []
+        var tasks: [Task<URL, Error>] = []
         for url in urls {
             if let runningTask = await runningAPITracker[url] {
                 tasks.append(runningTask)
                 continue
             }
-            let task = Task { await Download(url) }
+            let task = Task { try await Download(url) }
             tasks.append(task)
             await runningAPITracker.set(task, for: url)
         }
         
-        var urls: [URL?] = []
+        var urls: [Result<URL, Error>] = []
         for task in tasks {
-            urls.append(await task.value)
+            do {
+                urls.append(.success(try await task.value))
+            } catch {
+                urls.append(.failure(error))
+            }
         }
         return urls
     }

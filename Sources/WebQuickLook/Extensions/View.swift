@@ -1,5 +1,6 @@
 import SwiftUI
 
+//TODO: - add other swift ui equalants API for webQuicklook
 extension View {
     public func webQuickLookPreview(_ item: Binding<URL?>) -> some View {
         self
@@ -9,6 +10,6 @@ extension View {
     }
 }
 
-extension URL: @retroactive Identifiable {
+extension URL: Identifiable {
     public var id: URL { self }
 }
