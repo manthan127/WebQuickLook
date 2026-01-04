@@ -8,13 +8,14 @@
 import Foundation
 
 actor RunningAPITracker {
-    var dic: [URL: Task<URL, Error>] = [:]
+    typealias T = Task<Void, Never>
+    var dic: [URL: T] = [:]
     
-    subscript(_ key: URL) -> Task<URL, Error>? {
+    subscript(_ key: URL) -> T? {
         dic[key]
     }
     
-    func set(_ newValue: Task<URL, Error>, for key: URL) {
+    func set(_ newValue: T, for key: URL) {
         dic[key] = newValue
     }
 }

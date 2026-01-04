@@ -9,21 +9,19 @@ import QuickLook
 
 extension PreviewViewController: QLPreviewControllerDataSource {
     public func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
-        return remoteURLs.count
+        return resources.count
     }
     
     public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-        guard index < localFileURLs.count else {
-            return CallingAPIURL() as QLPreviewItem
+        guard index < resources.count, let result = resources[index].result else {
+            return (WebQuickLook.downloading ?? CallingAPIURL()) as QLPreviewItem
         }
-        
-        let result = localFileURLs[index]
         
         switch result {
         case .success(let url):
             return url as QLPreviewItem
         case .failure(_):
-            return failURL() as QLPreviewItem
+            return (WebQuickLook.downloadFailed ?? failURL()) as QLPreviewItem
         }
     }
 }

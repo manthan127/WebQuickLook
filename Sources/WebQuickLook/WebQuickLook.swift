@@ -12,10 +12,9 @@ import Foundation
 //   -- show all type of possible screens to user (written below)
 //   -- show preview of custom type
 // - add documentation
+// - rename variables
 
 // - possible screen to show to the user
-//   -- downloading
-//   -- download failed
 //   -- invalid file type
 //   -- file size bigger than max allowed
 
@@ -26,10 +25,16 @@ import Foundation
 
 // - make swiftUI like function for users to use
 
-// - canccel api call when quick look is dismissed (with/without reumeData)
+// - cancel api call when quick look is dismissed (with/without resumeData)
+
+// - handle case where duplicate urls are given to the quicklook
+
+// - add some way to reload files that are failed
+
+typealias DownloadResult = Result<URL, Error>
 
 enum WebQuickLook {
-    static var maxFileSize: Int64 = 10 * 1024 * 1024
+    static var maxFileSize: Int64 = 5 * 1024 * 1024
     
     static var downloading: URL?
     static var downloadFailed: URL?

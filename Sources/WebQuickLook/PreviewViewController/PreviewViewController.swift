@@ -8,13 +8,18 @@
 import UIKit
 import QuickLook
 
+struct RemoteResource {
+    let remoteURL: URL
+    var result: Result<URL, any Error>?
+}
+
+// TODO: add option for lazy loading of files or load all at once
 public class PreviewViewController: QLPreviewController {
 
-    internal var remoteURLs: [URL] = []
-    internal var localFileURLs: [Result<URL, any Error>] = []
+    internal var resources: [RemoteResource] = []
     
     public init(remoteURLs: [URL]) {
-        self.remoteURLs = remoteURLs
+        resources = remoteURLs.map {RemoteResource(remoteURL: $0)}
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -28,8 +33,12 @@ public class PreviewViewController: QLPreviewController {
         delegate = self
         
         Task {
-            self.localFileURLs = await DownloadHandler.shared.downloadFiles(from: remoteURLs)
-            self.reloadData()
+            await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { ind, res in
+                await MainActor.run {
+                    self.resources[ind].result = res
+                    self.reloadData()
+                }
+            }
         }
     
         if self.navigationItem.rightBarButtonItem == nil {

@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class DownloadHandler {
+internal class DownloadHandler {
     private init() {
         try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
     }
@@ -16,7 +16,7 @@ public class DownloadHandler {
     private var runningAPITracker = RunningAPITracker()
     private let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
     
-    private lazy var session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
+    private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
     
     func Download(_ remoteURL: URL) async throws -> URL {
         let fileName = remoteURL.lastPathComponent
@@ -43,29 +43,23 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     }
 }
 
-public extension DownloadHandler {
-    func downloadFiles(from urls: [URL]) async -> [Result<URL, Error>] {
-        // used array of task instead of TaskGroup to keep responses in correct order
-        var tasks: [Task<URL, Error>] = []
-        for url in urls {
-            if let runningTask = await runningAPITracker[url] {
-                tasks.append(runningTask)
-                continue
+internal extension DownloadHandler {
+    func downloadFiles(from urls: [URL], completion: @escaping (Int, DownloadResult) async -> ()) async {
+        for (ind, url) in urls.enumerated() {
+//            if let _ = await runningAPITracker[url] {
+//                continue
+//            }
+//            let task = 
+            Task {
+                do {
+                    let url = try await Download(url)
+                    await completion(ind, .success(url))
+                } catch {
+                    await completion(ind, .failure(error))
+                }
             }
-            let task = Task { try await Download(url) }
-            tasks.append(task)
-            await runningAPITracker.set(task, for: url)
+//            await runningAPITracker.set(task, for: url)
         }
-        
-        var urls: [Result<URL, Error>] = []
-        for task in tasks {
-            do {
-                urls.append(.success(try await task.value))
-            } catch {
-                urls.append(.failure(error))
-            }
-        }
-        return urls
     }
     
     func deleteAll() throws {
