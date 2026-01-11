@@ -7,32 +7,6 @@
 
 import Foundation
 
-internal class DownloadHandler {
-    private init() {
-        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
-    }
-    public static let shared = DownloadHandler()
-    
-    private var runningAPITracker = RunningAPITracker()
-    private let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
-    
-    private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
-    
-    func Download(_ remoteURL: URL) async throws -> URL {
-        let fileName = remoteURL.lastPathComponent
-        let localURL = directoryURL.appendingPathComponent(fileName)
-        
-        if FileManager.default.fileExists(atPath: localURL.path) {
-            return localURL
-        }
-        
-        let (data, _) = try await session.data(from: remoteURL)
-        try data.write(to: localURL)
-        return localURL
-    }
-}
-
-
 final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     func urlSession(
         _ session: URLSession,
@@ -43,23 +17,48 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     }
 }
 
+fileprivate let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
+fileprivate var plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
+
+internal final class DownloadHandler {
+    private init() {
+        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
+        mapping = Self.loadMappingFromDisk(plistURL: plistURL)
+    }
+    public static let shared = DownloadHandler()
+    private var runningAPITracker = RunningAPITracker()
+    
+    /// In-memory mapping: remoteURL → filename
+    private var mapping: [URL: String]
+
+    private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
+}
+
 internal extension DownloadHandler {
     func downloadFiles(from urls: [URL], completion: @escaping (Int, DownloadResult) async -> ()) async {
-        for (ind, url) in urls.enumerated() {
-//            if let _ = await runningAPITracker[url] {
-//                continue
-//            }
-//            let task = 
-            Task {
-                do {
-                    let url = try await Download(url)
-                    await completion(ind, .success(url))
-                } catch {
-                    await completion(ind, .failure(error))
+        await withTaskGroup(of: Void.self) { group in
+            for (ind, url) in urls.enumerated() {
+                //            if let _ = await runningAPITracker[url] {
+                //                continue
+                //            }
+                //            let task =
+                group.addTask {
+                    do {
+                        let id = UUID().uuidString
+                        // TODO: - prone to race condition and will be issue if there is similar url in same array
+                        let name = self.mapping[url] ?? id
+                        self.mapping[url] = name
+                        
+                        let url = try await self.Download(url, fileName: name)
+                        await completion(ind, .success(url))
+                    } catch {
+                        await completion(ind, .failure(error))
+                    }
                 }
+                //            await runningAPITracker.set(task, for: url)
             }
-//            await runningAPITracker.set(task, for: url)
         }
+        try? saveMappingToDisk()
     }
     
     func deleteAll() throws {
@@ -68,9 +67,67 @@ internal extension DownloadHandler {
     
     func delete(at url: URL) throws {
         try FileManager.default.removeItem(at: url)
+        removeValueFromMapping(url.lastPathComponent)
     }
     
     func delete(named name: String) throws {
         try FileManager.default.removeItem(at: directoryURL.appendingPathComponent(name))
+        removeValueFromMapping(name)
+    }
+    
+    func removeValueFromMapping(_ value: String) {
+        if let key = mapping.first(where: {$0.value == value})?.key {
+            mapping.removeValue(forKey: key)
+            try? saveMappingToDisk()
+        }
+    }
+}
+
+private extension DownloadHandler {
+    private func Download(_ remoteURL: URL, fileName: String) async throws -> URL {
+        let localURL = directoryURL.appendingPathComponent(fileName)
+        
+        if FileManager.default.fileExists(atPath: localURL.path) {
+            return localURL
+        }
+        
+        let (data, _) = try await session.data(from: remoteURL)
+        try data.write(to: localURL)
+        return localURL
+    }
+    
+    static func loadMappingFromDisk(plistURL: URL) -> [URL: String] {
+        guard
+            let data = try? Data(contentsOf: plistURL),
+            let raw = try? PropertyListSerialization.propertyList(
+                from: data,
+                options: [],
+                format: nil
+            ) as? [String: String]
+        else {
+            return [:]
+        }
+        
+        return Dictionary(
+            uniqueKeysWithValues: raw.compactMap { key, value in
+                guard let url = URL(string: key) else { return nil }
+                return (url, value)
+            }
+        )
+    }
+    
+    /// Saves in-memory mapping to mapping.plist
+    func saveMappingToDisk() throws {
+        let raw: [String: String] = mapping.reduce(into: [:]) {
+            $0[$1.key.absoluteString] = $1.value
+        }
+        
+        let data = try PropertyListSerialization.data(
+            fromPropertyList: raw,
+            format: .xml,
+            options: 0
+        )
+        
+        try data.write(to: plistURL, options: .atomic)
     }
 }

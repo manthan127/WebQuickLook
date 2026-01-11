@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,6 +12,8 @@
 		F48F86B02F06CE540045F03A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86AF2F06CE540045F03A /* Assets.xcassets */; };
 		F48F86B32F06CE540045F03A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86B22F06CE540045F03A /* Preview Assets.xcassets */; };
 		F494C0002F0979E300F313F7 /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F494BFFF2F0979E300F313F7 /* WebQuickLook */; };
+		F4D958872F137BCD0083B63A /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F4D958862F137BCD0083B63A /* WebQuickLook */; };
+		F4D9588B2F137C380083B63A /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F4D9588A2F137C380083B63A /* WebQuickLook */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,7 +30,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4D958872F137BCD0083B63A /* WebQuickLook in Frameworks */,
 				F494C0002F0979E300F313F7 /* WebQuickLook in Frameworks */,
+				F4D9588B2F137C380083B63A /* WebQuickLook in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,8 +69,8 @@
 		F48F86B12F06CE540045F03A /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
-				F494C0012F097A3A00F313F7 /* WebQuickLook */,
 				F48F86B22F06CE540045F03A /* Preview Assets.xcassets */,
+				F494C0012F097A3A00F313F7 /* WebQuickLook */,
 			);
 			path = "Preview Content";
 			sourceTree = "<group>";
@@ -89,6 +93,8 @@
 			name = WebQuickLookExample;
 			packageProductDependencies = (
 				F494BFFF2F0979E300F313F7 /* WebQuickLook */,
+				F4D958862F137BCD0083B63A /* WebQuickLook */,
+				F4D9588A2F137C380083B63A /* WebQuickLook */,
 			);
 			productName = WebQuickLookExample;
 			productReference = F48F86A82F06CE530045F03A /* WebQuickLookExample.app */;
@@ -119,6 +125,7 @@
 			);
 			mainGroup = F48F869F2F06CE530045F03A;
 			packageReferences = (
+				F4D958892F137C380083B63A /* XCLocalSwiftPackageReference "../WebQuickLook" */,
 			);
 			productRefGroup = F48F86A92F06CE530045F03A /* Products */;
 			projectDirPath = "";
@@ -352,8 +359,23 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		F4D958892F137C380083B63A /* XCLocalSwiftPackageReference "../WebQuickLook" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../WebQuickLook;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		F494BFFF2F0979E300F313F7 /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+		F4D958862F137BCD0083B63A /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+		F4D9588A2F137C380083B63A /* WebQuickLook */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WebQuickLook;
 		};
