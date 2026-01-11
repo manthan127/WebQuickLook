@@ -20,11 +20,12 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
 }
 
 fileprivate let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
-fileprivate var plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
+fileprivate let plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
+internal let defaultMessageDirectoryURL = directoryURL.appendingPathComponent("defaultFiles")
 
 internal final class DownloadHandler {
     private init() {
-        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
+        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
         mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
     }
     public static let shared = DownloadHandler()

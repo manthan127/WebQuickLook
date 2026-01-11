@@ -7,6 +7,8 @@
 
 import Foundation
 
+// TODO: - make file I/O code better and less verbose
+
 // TODO: -
 // - add example app
 //   -- show all type of possible screens to user (written below)
@@ -38,7 +40,11 @@ public enum WebQuickLook {
     public static var config: Config = .init()
     
     internal static func makeFile(name: String, text: String) -> URL {
-        let errorURL = FileManager.default.temporaryDirectory.appendingPathComponent(name + ".txt")
+        if !FileManager.default.fileExists(atPath: defaultMessageDirectoryURL.path) {
+            try? FileManager.default.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
+        }
+        
+        let errorURL = defaultMessageDirectoryURL.appendingPathComponent(name + ".txt")
         if !FileManager.default.fileExists(atPath: errorURL.path) {
             try? text.write(to: errorURL, atomically: true, encoding: .utf8)
         }
@@ -47,11 +53,11 @@ public enum WebQuickLook {
 }
 
 public struct Config {
-    var maxFileSize: Int64 = 5 * 1024 * 1024
+    public var maxFileSize: Int64 = 5 * 1024 * 1024
     
-    var downloading: URL?
-    var downloadFailed: URL?
+    public var downloading: URL?
+    public var downloadFailed: URL?
     
-    var invalidFileType: URL?
-    var bigFile: URL?
+    public var invalidFileType: URL?
+    public var bigFile: URL?
 }
