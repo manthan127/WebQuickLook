@@ -6,14 +6,16 @@
 //
 
 import Foundation
+import QuickLook
 
+// MARK: This is not working
 final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
     func urlSession(
         _ session: URLSession,
         dataTask: URLSessionDataTask,
         didReceive response: URLResponse
     ) async -> URLSession.ResponseDisposition {
-        response.expectedContentLength > WebQuickLook.maxFileSize ? .cancel : .allow
+        response.expectedContentLength > WebQuickLook.config.maxFileSize ? .cancel : .allow
     }
 }
 
@@ -26,10 +28,10 @@ internal final class DownloadHandler {
         mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
     }
     public static let shared = DownloadHandler()
-    private var runningAPITracker = ActorDictionary<URL, Task<Void, Never>>()
     
     /// In-memory mapping: remoteURL → filename
     private var mapping: ActorDictionary<URL, String>
+    private var runningAPITracker = ActorDictionary<URL, Task<Void, Never>>()
 
     private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
 }
@@ -38,6 +40,10 @@ internal extension DownloadHandler {
     func downloadFiles(from urls: [URL], completion: @escaping (Int, DownloadResult) async -> ()) async {
         await withTaskGroup(of: Void.self) { group in
             for (ind, url) in urls.enumerated() {
+                guard await !QLPreviewController.canPreview(url as QLPreviewItem) else {
+                    await completion(ind, .failure(WebQuickLookError.invalidFileType))
+                    continue
+                }
                 //            if let _ = await runningAPITracker[url] {
                 //                continue
                 //            }
@@ -45,7 +51,7 @@ internal extension DownloadHandler {
                 group.addTask {
                     do {
                         let id = UUID().uuidString + url.pathExtension
-                        // TODO: - prone to race condition and will be issue if there is similar url in same array
+                        // TODO: - will be issue if there is same url in array
                         let name = await self.mapping[url] ?? id
                         await self.mapping.set(name, for: url)
                 

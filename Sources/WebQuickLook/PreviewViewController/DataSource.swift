@@ -14,32 +14,29 @@ extension PreviewViewController: QLPreviewControllerDataSource {
     
     public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
         guard index < resources.count, let result = resources[index].result else {
-            return (WebQuickLook.downloading ?? CallingAPIURL()) as QLPreviewItem
+            return callingAPIURL() as QLPreviewItem
         }
         
         switch result {
         case .success(let url):
             return url as QLPreviewItem
-        case .failure(_):
-            return (WebQuickLook.downloadFailed ?? failURL()) as QLPreviewItem
+        case .failure(let error):
+            switch error {
+            case let error as WebQuickLookError :
+                return error.makeFile() as QLPreviewItem
+            default:
+                return failURL() as QLPreviewItem
+            }
         }
     }
 }
 
 private extension PreviewViewController {
     func failURL() -> URL {
-        let errorURL = FileManager.default.temporaryDirectory.appendingPathComponent("error.txt")
-        if !FileManager.default.fileExists(atPath: errorURL.path) {
-            try? "Failed to load file.".write(to: errorURL, atomically: true, encoding: .utf8)
-        }
-        return errorURL
+        WebQuickLook.config.downloadFailed ?? WebQuickLook.makeFile(name: "error", text: "Failed to load file.")
     }
     
-    func CallingAPIURL() -> URL {
-        let errorURL = FileManager.default.temporaryDirectory.appendingPathComponent("processing.txt")
-        if !FileManager.default.fileExists(atPath: errorURL.path) {
-            try? "API is Being Called".write(to: errorURL, atomically: true, encoding: .utf8)
-        }
-        return errorURL
+    func callingAPIURL() -> URL {
+        WebQuickLook.config.downloading ?? WebQuickLook.makeFile(name: "processing", text: "API is Being Called")
     }
 }

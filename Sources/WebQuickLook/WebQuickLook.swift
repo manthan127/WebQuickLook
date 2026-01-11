@@ -12,10 +12,9 @@ import Foundation
 //   -- show all type of possible screens to user (written below)
 //   -- show preview of custom type
 // - add documentation
-// - rename variables
 
 // - possible screen to show to the user
-//   -- invalid file type
+//   -- invalid file type ✅
 //   -- file size bigger than max allowed
 
 // - user can tell if they are supporting custom type of url
@@ -31,13 +30,28 @@ import Foundation
 
 // - add some way to reload files that are failed
 
+// - also allow URLRequest instead of url
+
 typealias DownloadResult = Result<URL, Error>
 
 public enum WebQuickLook {
-    public static var maxFileSize: Int64 = 5 * 1024 * 1024
+    public static var config: Config = .init()
     
-    public static var downloading: URL?
-    public static var downloadFailed: URL?
-    public static var invalidFileType: URL?
-    public static var bigFile: URL?
+    internal static func makeFile(name: String, text: String) -> URL {
+        let errorURL = FileManager.default.temporaryDirectory.appendingPathComponent(name + ".txt")
+        if !FileManager.default.fileExists(atPath: errorURL.path) {
+            try? text.write(to: errorURL, atomically: true, encoding: .utf8)
+        }
+        return errorURL
+    }
+}
+
+public struct Config {
+    var maxFileSize: Int64 = 5 * 1024 * 1024
+    
+    var downloading: URL?
+    var downloadFailed: URL?
+    
+    var invalidFileType: URL?
+    var bigFile: URL?
 }
