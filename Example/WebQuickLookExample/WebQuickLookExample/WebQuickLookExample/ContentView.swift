@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import WebQuickLook
 
 struct ContentView: View {
     var body: some View {

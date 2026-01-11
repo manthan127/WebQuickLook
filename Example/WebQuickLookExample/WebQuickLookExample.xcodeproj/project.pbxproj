@@ -11,6 +11,10 @@
 		F48F86AE2F06CE530045F03A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48F86AD2F06CE530045F03A /* ContentView.swift */; };
 		F48F86B02F06CE540045F03A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86AF2F06CE540045F03A /* Assets.xcassets */; };
 		F48F86B32F06CE540045F03A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86B22F06CE540045F03A /* Preview Assets.xcassets */; };
+		F494C0002F0979E300F313F7 /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F494BFFF2F0979E300F313F7 /* WebQuickLook */; };
+		F4D958872F137BCD0083B63A /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F4D958862F137BCD0083B63A /* WebQuickLook */; };
+		F4D9588B2F137C380083B63A /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F4D9588A2F137C380083B63A /* WebQuickLook */; };
+		F4F529D92F13C764005BCDC6 /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F4F529D82F13C764005BCDC6 /* WebQuickLook */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -19,6 +23,7 @@
 		F48F86AD2F06CE530045F03A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F48F86AF2F06CE540045F03A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F48F86B22F06CE540045F03A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F4F529DA2F13C7D3005BCDC6 /* WebQuickLook */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = WebQuickLook; path = ../../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -26,6 +31,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4F529D92F13C764005BCDC6 /* WebQuickLook in Frameworks */,
+				F4D958872F137BCD0083B63A /* WebQuickLook in Frameworks */,
+				F494C0002F0979E300F313F7 /* WebQuickLook in Frameworks */,
+				F4D9588B2F137C380083B63A /* WebQuickLook in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +64,7 @@
 				F48F86AD2F06CE530045F03A /* ContentView.swift */,
 				F48F86AF2F06CE540045F03A /* Assets.xcassets */,
 				F48F86B12F06CE540045F03A /* Preview Content */,
+				F4F529DA2F13C7D3005BCDC6 /* WebQuickLook */,
 			);
 			path = WebQuickLookExample;
 			sourceTree = "<group>";
@@ -83,6 +93,12 @@
 			dependencies = (
 			);
 			name = WebQuickLookExample;
+			packageProductDependencies = (
+				F494BFFF2F0979E300F313F7 /* WebQuickLook */,
+				F4D958862F137BCD0083B63A /* WebQuickLook */,
+				F4D9588A2F137C380083B63A /* WebQuickLook */,
+				F4F529D82F13C764005BCDC6 /* WebQuickLook */,
+			);
 			productName = WebQuickLookExample;
 			productReference = F48F86A82F06CE530045F03A /* WebQuickLookExample.app */;
 			productType = "com.apple.product-type.application";
@@ -111,6 +127,8 @@
 				Base,
 			);
 			mainGroup = F48F869F2F06CE530045F03A;
+			packageReferences = (
+			);
 			productRefGroup = F48F86A92F06CE530045F03A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -342,6 +360,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F494BFFF2F0979E300F313F7 /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+		F4D958862F137BCD0083B63A /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+		F4D9588A2F137C380083B63A /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+		F4F529D82F13C764005BCDC6 /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F48F86A02F06CE530045F03A /* Project object */;
 }

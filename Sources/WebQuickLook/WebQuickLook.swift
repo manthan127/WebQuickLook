@@ -33,11 +33,11 @@ import Foundation
 
 typealias DownloadResult = Result<URL, Error>
 
-enum WebQuickLook {
-    static var maxFileSize: Int64 = 5 * 1024 * 1024
+public enum WebQuickLook {
+    public static var maxFileSize: Int64 = 5 * 1024 * 1024
     
-    static var downloading: URL?
-    static var downloadFailed: URL?
-    static var invalidFileType: URL?
-    static var bigFile: URL?
+    public static var downloading: URL?
+    public static var downloadFailed: URL?
+    public static var invalidFileType: URL?
+    public static var bigFile: URL?
 }

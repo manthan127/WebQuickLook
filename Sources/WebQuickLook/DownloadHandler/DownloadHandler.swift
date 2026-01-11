@@ -23,13 +23,13 @@ fileprivate var plistURL: URL = directoryURL.appendingPathComponent("mapping.pli
 internal final class DownloadHandler {
     private init() {
         try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: false)
-        mapping = Self.loadMappingFromDisk(plistURL: plistURL)
+        mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
     }
     public static let shared = DownloadHandler()
-    private var runningAPITracker = RunningAPITracker()
+    private var runningAPITracker = ActorDictionary<URL, Task<Void, Never>>()
     
     /// In-memory mapping: remoteURL → filename
-    private var mapping: [URL: String]
+    private var mapping: ActorDictionary<URL, String>
 
     private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
 }
@@ -44,12 +44,12 @@ internal extension DownloadHandler {
                 //            let task =
                 group.addTask {
                     do {
-                        let id = UUID().uuidString
+                        let id = UUID().uuidString + url.pathExtension
                         // TODO: - prone to race condition and will be issue if there is similar url in same array
-                        let name = self.mapping[url] ?? id
-                        self.mapping[url] = name
-                        
-                        let url = try await self.Download(url, fileName: name)
+                        let name = await self.mapping[url] ?? id
+                        await self.mapping.set(name, for: url)
+                
+                        let url = try await self.Download(url, fileName: url.lastPathComponent)
                         await completion(ind, .success(url))
                     } catch {
                         await completion(ind, .failure(error))
@@ -75,10 +75,12 @@ internal extension DownloadHandler {
         removeValueFromMapping(name)
     }
     
-    func removeValueFromMapping(_ value: String) {
-        if let key = mapping.first(where: {$0.value == value})?.key {
-            mapping.removeValue(forKey: key)
-            try? saveMappingToDisk()
+    private func removeValueFromMapping(_ value: String) {
+        Task {
+            if let key = await mapping.first(where: {$0.value == value})?.key {
+                await mapping.removeValue(forKey: key)
+                try? saveMappingToDisk()
+            }
         }
     }
 }
@@ -118,16 +120,18 @@ private extension DownloadHandler {
     
     /// Saves in-memory mapping to mapping.plist
     func saveMappingToDisk() throws {
-        let raw: [String: String] = mapping.reduce(into: [:]) {
-            $0[$1.key.absoluteString] = $1.value
+        Task {
+            let raw: [String: String] = await mapping.reduce(into: [:]) {
+                $0[$1.key.absoluteString] = $1.value
+            }
+            
+            let data = try PropertyListSerialization.data(
+                fromPropertyList: raw,
+                format: .xml,
+                options: 0
+            )
+            
+            try data.write(to: plistURL, options: .atomic)
         }
-        
-        let data = try PropertyListSerialization.data(
-            fromPropertyList: raw,
-            format: .xml,
-            options: 0
-        )
-        
-        try data.write(to: plistURL, options: .atomic)
     }
 }
