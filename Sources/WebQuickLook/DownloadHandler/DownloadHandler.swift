@@ -22,10 +22,13 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
 fileprivate let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
 fileprivate let plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
 internal let defaultMessageDirectoryURL = directoryURL.appendingPathComponent("defaultFiles")
+internal let demoDirectoryURL = directoryURL.appendingPathComponent("demoFiles")
 
 internal final class DownloadHandler {
     private init() {
         try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
+        try? FileManager.default.createDirectory(at: demoDirectoryURL, withIntermediateDirectories: true)
         mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
     }
     public static let shared = DownloadHandler()
@@ -41,7 +44,7 @@ internal extension DownloadHandler {
     func downloadFiles(from urls: [URL], completion: @escaping (Int, DownloadResult) async -> ()) async {
         await withTaskGroup(of: Void.self) { group in
             for (ind, url) in urls.enumerated() {
-                guard await !QLPreviewController.canPreview(url as QLPreviewItem) else {
+                guard canPreview(ext: url.pathExtension) else {
                     await completion(ind, .failure(WebQuickLookError.invalidFileType))
                     continue
                 }
@@ -93,6 +96,21 @@ internal extension DownloadHandler {
 }
 
 private extension DownloadHandler {
+    private func canPreview(ext: String) -> Bool {
+        let url = demoDirectoryURL.appendingPathComponent("demo."+ext)
+        
+        if FileManager.default.fileExists(atPath: url.path) {
+            return true
+        }
+        do {
+            try Data().write(to: url)
+            return QLPreviewController.canPreview(url as QLPreviewItem)
+        } catch {
+            return false
+        }
+    }
+    
+   
     private func Download(_ remoteURL: URL, fileName: String) async throws -> URL {
         let localURL = directoryURL.appendingPathComponent(fileName)
         

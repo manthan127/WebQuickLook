@@ -33,6 +33,7 @@ import Foundation
 // - add some way to reload files that are failed
 
 // - also allow URLRequest instead of url
+// - view is flashed when there is multiple urls
 
 typealias DownloadResult = Result<URL, Error>
 
@@ -40,10 +41,6 @@ public enum WebQuickLook {
     public static var config: Config = .init()
     
     internal static func makeFile(name: String, text: String) -> URL {
-        if !FileManager.default.fileExists(atPath: defaultMessageDirectoryURL.path) {
-            try? FileManager.default.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
-        }
-        
         let errorURL = defaultMessageDirectoryURL.appendingPathComponent(name + ".txt")
         if !FileManager.default.fileExists(atPath: errorURL.path) {
             try? text.write(to: errorURL, atomically: true, encoding: .utf8)
