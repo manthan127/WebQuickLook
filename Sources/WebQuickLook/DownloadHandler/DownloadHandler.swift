@@ -54,12 +54,12 @@ internal extension DownloadHandler {
                 //            let task =
                 group.addTask {
                     do {
-                        let id = UUID().uuidString + url.pathExtension
-                        // TODO: - will be issue if there is same url in array
-                        let name = await self.mapping[url] ?? id
-                        await self.mapping.set(name, for: url)
-                
-                        let url = try await self.Download(url, fileName: url.lastPathComponent)
+                        // TODO: - need to optimize if there is same url in array (right now there will be two different api call for same resource)
+                        
+                        let name = await self.fileNAme(url: url)
+                        let localURL = directoryURL.appendingPathComponent(name + "/" + url.lastPathComponent)
+                        
+                        let url = try await self.Download(url, localURL: localURL)
                         await completion(ind, .success(url))
                     } catch {
                         await completion(ind, .failure(error))
@@ -73,6 +73,10 @@ internal extension DownloadHandler {
     
     func deleteAll() throws {
         try FileManager.default.removeItem(at: directoryURL)
+        Task {
+            await mapping.removeAll()
+            try? saveMappingToDisk()
+        }
     }
     
     func delete(at url: URL) throws {
@@ -96,24 +100,35 @@ internal extension DownloadHandler {
 }
 
 private extension DownloadHandler {
-    private func canPreview(ext: String) -> Bool {
+    func fileNAme(url: URL) async -> String {
+        if let map = await self.mapping[url] {
+            return map
+        } else {
+            // using UUID as folder name for handling duplicate names of files
+            let name = UUID().uuidString
+            
+            try? FileManager.default.createDirectory(at: directoryURL.appendingPathComponent(name), withIntermediateDirectories: true)
+            await self.mapping.set(name, for: url)
+            
+            return name
+        }
+    }
+    
+    func canPreview(ext: String) -> Bool {
         let url = demoDirectoryURL.appendingPathComponent("demo."+ext)
         
-        if FileManager.default.fileExists(atPath: url.path) {
-            return true
-        }
         do {
-            try Data().write(to: url)
+            if !FileManager.default.fileExists(atPath: url.path) {
+                try Data().write(to: url)
+            }
             return QLPreviewController.canPreview(url as QLPreviewItem)
         } catch {
             return false
         }
     }
     
-   
-    private func Download(_ remoteURL: URL, fileName: String) async throws -> URL {
-        let localURL = directoryURL.appendingPathComponent(fileName)
-        
+    
+    func Download(_ remoteURL: URL, localURL: URL) async throws -> URL {
         if FileManager.default.fileExists(atPath: localURL.path) {
             return localURL
         }
@@ -122,7 +137,9 @@ private extension DownloadHandler {
         try data.write(to: localURL)
         return localURL
     }
-    
+}
+
+private extension DownloadHandler {
     static func loadMappingFromDisk(plistURL: URL) -> [URL: String] {
         guard
             let data = try? Data(contentsOf: plistURL),

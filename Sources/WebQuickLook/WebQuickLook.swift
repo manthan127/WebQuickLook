@@ -35,6 +35,8 @@ import Foundation
 // - also allow URLRequest instead of url
 // - view is flashed when there is multiple urls
 
+// right now when we can not show file in quicklook we are not downloading and showing the error file, give option to show the default View
+
 typealias DownloadResult = Result<URL, Error>
 
 public enum WebQuickLook {

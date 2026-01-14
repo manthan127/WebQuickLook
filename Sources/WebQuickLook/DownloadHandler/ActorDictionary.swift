@@ -28,6 +28,10 @@ actor ActorDictionary<Key: Hashable, Value>: ExpressibleByDictionaryLiteral {
         dictionary[key] = newValue
     }
     
+    func removeAll(keepingCapacity keepCapacity: Bool = false) {
+        dictionary.removeAll(keepingCapacity: keepCapacity)
+    }
+    
     @discardableResult
     func removeValue(forKey key: Key) -> Value? {
         dictionary.removeValue(forKey: key)
