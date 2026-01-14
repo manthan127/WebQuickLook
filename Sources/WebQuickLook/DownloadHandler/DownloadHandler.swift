@@ -35,28 +35,27 @@ internal final class DownloadHandler {
     
     /// In-memory mapping: remoteURL → filename
     private var mapping: ActorDictionary<URL, String>
-    private var runningAPITracker = ActorDictionary<URL, Task<Void, Never>>()
 
     private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
 }
 
 internal extension DownloadHandler {
-    func downloadFiles(from urls: [URL], completion: @escaping (Int, DownloadResult) async -> ()) async {
+    func downloadFiles(from urls: [URL], completion: @escaping ([Int], DownloadResult) async -> ()) async {
+        // grouping the same urls
+        var dic: [URL: [Int]] = [:]
+        for (ind, url) in (urls).enumerated() {
+            dic[url, default: []].append(ind)
+        }
+        
         await withTaskGroup(of: Void.self) { group in
-            for (ind, url) in urls.enumerated() {
+            for (url, ind) in dic {
                 guard canPreview(ext: url.pathExtension) else {
                     await completion(ind, .failure(WebQuickLookError.invalidFileType))
                     continue
                 }
-                //            if let _ = await runningAPITracker[url] {
-                //                continue
-                //            }
-                //            let task =
                 group.addTask {
                     do {
-                        // TODO: - need to optimize if there is same url in array (right now there will be two different api call for same resource)
-                        
-                        let name = await self.fileNAme(url: url)
+                        let name = await self.fileName(url: url)
                         let localURL = directoryURL.appendingPathComponent(name + "/" + url.lastPathComponent)
                         
                         let url = try await self.Download(url, localURL: localURL)
@@ -65,7 +64,6 @@ internal extension DownloadHandler {
                         await completion(ind, .failure(error))
                     }
                 }
-                //            await runningAPITracker.set(task, for: url)
             }
         }
         try? saveMappingToDisk()
@@ -100,7 +98,7 @@ internal extension DownloadHandler {
 }
 
 private extension DownloadHandler {
-    func fileNAme(url: URL) async -> String {
+    func fileName(url: URL) async -> String {
         if let map = await self.mapping[url] {
             return map
         } else {

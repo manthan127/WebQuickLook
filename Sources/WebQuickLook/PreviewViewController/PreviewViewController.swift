@@ -33,9 +33,11 @@ public class PreviewViewController: QLPreviewController {
 //        delegate = self
         
         downloadTask = Task {
-            await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { ind, res in
+            await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { indices, res in
                 await MainActor.run {
-                    self.resources[ind].result = res
+                    for ind in indices {
+                        self.resources[ind].result = res
+                    }
                     self.reloadData()
                 }
             }
@@ -52,5 +54,5 @@ public class PreviewViewController: QLPreviewController {
 //    }
 }
 
-// TODO: - implement delegate methodes
+// TODO: - implement delegate methods
 //extension PreviewViewController: QLPreviewControllerDelegate {}
