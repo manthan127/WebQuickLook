@@ -11,24 +11,25 @@ import Foundation
 
 // TODO: -
 // - add example app
-//   -- show all type of possible screens to user (written below)
+//   -- show all of the possible screens/functionality to user (written below)
 //   -- show preview of custom type
 // - add documentation
 
+// give user option to at what path user wants to save data 
 // - possible screen to show to the user
 //   -- invalid file type ✅
 //   -- file size bigger than max allowed
 
-// - user can tell if they are supporting custom type of url
+// - user can support custom type(probably handling is on user's side, just need to test)
+// https://medium.com/@itsuki.enjoy/swiftui-quicklook-preview-edit-files-in-app-generate-thumbnails-for-files-on-the-fly-18bcc7e475db
+// https://www.kodeco.com/10447506-quicklook-previews-for-ios-getting-started
+// http://developer.apple.com/augmented-reality/quick-look/
 // - right now we are using last path component of remote url to decide file name there are may problem with this
 //   -- remote url might not have extension so will be unsure about the type
-//   -- there might be two different urls with the same last path components resulting in first one being overwritten by other
 
 // - make swiftUI like function for users to use
 
 // - cancel api call when quick look is dismissed (with/without resumeData)
-
-// - handle case where duplicate urls are given to the quicklook
 
 // - add some way to reload files that are failed
 

@@ -15,7 +15,9 @@ final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
         dataTask: URLSessionDataTask,
         didReceive response: URLResponse
     ) async -> URLSession.ResponseDisposition {
-        response.expectedContentLength > WebQuickLook.config.maxFileSize ? .cancel : .allow
+        let size = response.expectedContentLength
+        print("Expected size:", size)
+        return size > WebQuickLook.config.maxFileSize ? .cancel : .allow
     }
 }
 
@@ -26,17 +28,18 @@ internal let demoDirectoryURL = directoryURL.appendingPathComponent("demoFiles")
 
 internal final class DownloadHandler {
     private init() {
-        try? FileManager.default.createDirectory(at: directoryURL, withIntermediateDirectories: true)
-        try? FileManager.default.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
-        try? FileManager.default.createDirectory(at: demoDirectoryURL, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(at: demoDirectoryURL, withIntermediateDirectories: true)
         mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
     }
     public static let shared = DownloadHandler()
     
     /// In-memory mapping: remoteURL → filename
     private var mapping: ActorDictionary<URL, String>
-
     private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
+    
+    private let fileManager = FileManager.default
 }
 
 internal extension DownloadHandler {
@@ -69,30 +72,21 @@ internal extension DownloadHandler {
         try? saveMappingToDisk()
     }
     
+    // TODO: - make this function accessible to the user
     func deleteAll() throws {
-        try FileManager.default.removeItem(at: directoryURL)
+        let contents = try fileManager.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+        
+        let preservedURLs = [defaultMessageDirectoryURL, demoDirectoryURL]
+        
+        // can speed this up if there is call that takes multiple url at time yo delete it's child
+        for url in contents where !preservedURLs.contains(url) {
+            // there is one (User Mode -> Kernel Mode) switch for each file deletion
+            // if we can modify the directory's internal table might be possible with only one switch
+            try? fileManager.removeItem(at: url)
+        }
+        
         Task {
             await mapping.removeAll()
-            try? saveMappingToDisk()
-        }
-    }
-    
-    func delete(at url: URL) throws {
-        try FileManager.default.removeItem(at: url)
-        removeValueFromMapping(url.lastPathComponent)
-    }
-    
-    func delete(named name: String) throws {
-        try FileManager.default.removeItem(at: directoryURL.appendingPathComponent(name))
-        removeValueFromMapping(name)
-    }
-    
-    private func removeValueFromMapping(_ value: String) {
-        Task {
-            if let key = await mapping.first(where: {$0.value == value})?.key {
-                await mapping.removeValue(forKey: key)
-                try? saveMappingToDisk()
-            }
         }
     }
 }
@@ -105,7 +99,7 @@ private extension DownloadHandler {
             // using UUID as folder name for handling duplicate names of files
             let name = UUID().uuidString
             
-            try? FileManager.default.createDirectory(at: directoryURL.appendingPathComponent(name), withIntermediateDirectories: true)
+            try? fileManager.createDirectory(at: directoryURL.appendingPathComponent(name), withIntermediateDirectories: true)
             await self.mapping.set(name, for: url)
             
             return name
@@ -116,7 +110,7 @@ private extension DownloadHandler {
         let url = demoDirectoryURL.appendingPathComponent("demo."+ext)
         
         do {
-            if !FileManager.default.fileExists(atPath: url.path) {
+            if !fileManager.fileExists(atPath: url.path) {
                 try Data().write(to: url)
             }
             return QLPreviewController.canPreview(url as QLPreviewItem)
@@ -127,7 +121,7 @@ private extension DownloadHandler {
     
     
     func Download(_ remoteURL: URL, localURL: URL) async throws -> URL {
-        if FileManager.default.fileExists(atPath: localURL.path) {
+        if fileManager.fileExists(atPath: localURL.path) {
             return localURL
         }
         

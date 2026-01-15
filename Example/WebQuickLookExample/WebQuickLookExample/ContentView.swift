@@ -15,6 +15,7 @@ struct ContentView: View {
     var body: some View {
         QuickLookPreview(
             urls: [
+                "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz",// not showing preview
                 "https://download.blender.org/demo/2_big_buck_bunny_v2.pdf",
                 "https://download.blender.org/demo/BlenderIconsSet_v1.0.penpot",
                 "https://download.blender.org/demo/greasepencil-bike.blend",
