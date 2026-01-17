@@ -5,7 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "WebQuickLook",
-    platforms: [.iOS(.v14)],
+    // using iOS 15 because diving delegate to individual task is only available after iOs 15
+    // can support previous version if we use delegate in the settion object
+    platforms: [.iOS(.v15)], 
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(

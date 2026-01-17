@@ -8,19 +8,6 @@
 import Foundation
 import QuickLook
 
-// MARK: This is not working
-final class Delegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
-    func urlSession(
-        _ session: URLSession,
-        dataTask: URLSessionDataTask,
-        didReceive response: URLResponse
-    ) async -> URLSession.ResponseDisposition {
-        let size = response.expectedContentLength
-        print("Expected size:", size)
-        return size > WebQuickLook.config.maxFileSize ? .cancel : .allow
-    }
-}
-
 fileprivate let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
 fileprivate let plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
 internal let defaultMessageDirectoryURL = directoryURL.appendingPathComponent("defaultFiles")
@@ -37,7 +24,6 @@ internal final class DownloadHandler {
     
     /// In-memory mapping: remoteURL → filename
     private var mapping: ActorDictionary<URL, String>
-    private let session = URLSession(configuration: .default, delegate: Delegate(), delegateQueue: .main)
     
     private let fileManager = FileManager.default
 }
@@ -61,8 +47,8 @@ internal extension DownloadHandler {
                         let name = await self.fileName(url: url)
                         let localURL = directoryURL.appendingPathComponent(name + "/" + url.lastPathComponent)
                         
-                        let url = try await self.Download(url, localURL: localURL)
-                        await completion(ind, .success(url))
+                        try await self.Download(url, localURL: localURL)
+                        await completion(ind, .success(localURL))
                     } catch {
                         await completion(ind, .failure(error))
                     }
@@ -120,14 +106,18 @@ private extension DownloadHandler {
     }
     
     
-    func Download(_ remoteURL: URL, localURL: URL) async throws -> URL {
+    func Download(_ remoteURL: URL, localURL: URL) async throws {
         if fileManager.fileExists(atPath: localURL.path) {
-            return localURL
+            return
         }
         
-        let (data, _) = try await session.data(from: remoteURL)
+        let data = try await withCheckedThrowingContinuation { cont in
+            let task = URLSession.shared.dataTask(with: remoteURL)
+            task.delegate = DownloadDelegate(continuation: cont)
+            task.resume()
+        }
+        
         try data.write(to: localURL)
-        return localURL
     }
 }
 
