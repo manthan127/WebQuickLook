@@ -7,8 +7,8 @@
 
 import Foundation
 
-final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDataDelegate {
-    typealias C = CheckedContinuation<Data, any Error>
+final class DownloadDelegate: NSObject, URLSessionDataDelegate {
+    typealias C = CheckedContinuation<(Data, String?), any Error>
     let continuation: C
     
     private var accumulatedData = Data()
@@ -23,7 +23,8 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDataDelega
         if let error {
             continuation.resume(throwing: isCancled ? WebQuickLookError.bigFile : error)
         } else {
-            continuation.resume(returning: accumulatedData)
+            let name = task.response?.suggestedFilename
+            continuation.resume(returning: (accumulatedData, name))
         }
     }
     
@@ -40,10 +41,3 @@ final class DownloadDelegate: NSObject, URLSessionDelegate, URLSessionDataDelega
         return isCancled ? .cancel : .allow
     }
 }
-
-//extension DownloadDelegate: URLSessionDownloadDelegate {
-//    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-//        print(location)
-//        cont.resume(returning: location)
-//    }
-//}

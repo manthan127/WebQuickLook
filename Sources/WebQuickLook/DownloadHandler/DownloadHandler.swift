@@ -8,7 +8,7 @@
 import Foundation
 import QuickLook
 
-fileprivate let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
+internal let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
 fileprivate let plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
 internal let defaultMessageDirectoryURL = directoryURL.appendingPathComponent("defaultFiles")
 internal let demoDirectoryURL = directoryURL.appendingPathComponent("demoFiles")
@@ -38,18 +38,27 @@ internal extension DownloadHandler {
         
         await withTaskGroup(of: Void.self) { group in
             for (url, ind) in dic {
-                guard canPreview(ext: url.pathExtension) else {
-                    await completion(ind, .failure(WebQuickLookError.invalidFileType))
-                    continue
+//                if !url.pathExtension.isEmpty {
+                    guard canPreview(ext: url.pathExtension) else {
+                        await completion(ind, .failure(WebQuickLookError.invalidFileType))
+                        continue
+                    }
+//                }
+                
+                if let fileName = await self.mapping[url] {
+                    let fileURL = directoryURL.appendingPathComponent(fileName)
+                    if self.fileManager.fileExists(atPath: fileURL.path) {
+                        await completion(ind, .success(fileURL))
+                        continue
+                    }
                 }
+                
                 group.addTask {
                     do {
-                        let name = await self.fileName(url: url)
-                        let localURL = directoryURL.appendingPathComponent(name + "/" + url.lastPathComponent)
-                        
-                        try await self.Download(url, localURL: localURL)
+                        let localURL = try await self.Download(url)
                         await completion(ind, .success(localURL))
                     } catch {
+                        print(error)
                         await completion(ind, .failure(error))
                     }
                 }
@@ -78,20 +87,6 @@ internal extension DownloadHandler {
 }
 
 private extension DownloadHandler {
-    func fileName(url: URL) async -> String {
-        if let map = await self.mapping[url] {
-            return map
-        } else {
-            // using UUID as folder name for handling duplicate names of files
-            let name = UUID().uuidString
-            
-            try? fileManager.createDirectory(at: directoryURL.appendingPathComponent(name), withIntermediateDirectories: true)
-            await self.mapping.set(name, for: url)
-            
-            return name
-        }
-    }
-    
     func canPreview(ext: String) -> Bool {
         let url = demoDirectoryURL.appendingPathComponent("demo."+ext)
         
@@ -106,18 +101,25 @@ private extension DownloadHandler {
     }
     
     
-    func Download(_ remoteURL: URL, localURL: URL) async throws {
-        if fileManager.fileExists(atPath: localURL.path) {
-            return
-        }
-        
-        let data = try await withCheckedThrowingContinuation { cont in
+    func Download(_ remoteURL: URL) async throws -> URL {
+        let (data, name) = try await withCheckedThrowingContinuation { cont in
             let task = URLSession.shared.dataTask(with: remoteURL)
             task.delegate = DownloadDelegate(continuation: cont)
             task.resume()
         }
         
-        try data.write(to: localURL)
+        let directoryName = UUID().uuidString
+        let fileName = name ?? remoteURL.lastPathComponent
+        
+        let directoryPath = directoryURL.appendingPathComponent(directoryName)
+        let filePath = directoryPath.appendingPathComponent(fileName)
+        
+        try self.fileManager.createDirectory(at: directoryPath, withIntermediateDirectories: true)
+        try data.write(to: filePath)
+        
+        await self.mapping.set(directoryName + "/" + fileName, for: remoteURL)
+        
+        return filePath
     }
 }
 

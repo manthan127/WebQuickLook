@@ -12,20 +12,21 @@ import Foundation
 // TODO: -
 // - add example app
 //   -- show all of the possible screens/functionality to user (written below)
-//   -- show preview of custom type
 // - add documentation
 
 // give user option to at what path user wants to save data 
 // - possible screen to show to the user
 //   -- invalid file type ✅
-//   -- file size bigger than max allowed
+//   -- file size bigger than max allowed ✅
 
 // - user can support custom type(probably handling is on user's side, just need to test)
 // https://medium.com/@itsuki.enjoy/swiftui-quicklook-preview-edit-files-in-app-generate-thumbnails-for-files-on-the-fly-18bcc7e475db
 // https://www.kodeco.com/10447506-quicklook-previews-for-ios-getting-started
 // http://developer.apple.com/augmented-reality/quick-look/
-// - right now we are using last path component of remote url to decide file name there are may problem with this
+
+// - right now we are using last path component of remote url to decide file name there are may problem with this ✅
 //   -- remote url might not have extension so will be unsure about the type
+// using URLResponse.suggestedFilename right now to name local files this name is not guaranteed to work
 
 // - make swiftUI like function for users to use
 
@@ -33,10 +34,10 @@ import Foundation
 
 // - add some way to reload files that are failed
 
-// - also allow URLRequest instead of url
+// - allow URLRequest instead of url
 // - view is flashed when there is multiple urls
 
-// right now when we can not show file in quicklook we are not downloading and showing the error file, give option to show the default View
+// - default error screen is not very helpful
 
 typealias DownloadResult = Result<URL, Error>
 

@@ -10,6 +10,6 @@ extension View {
     }
 }
 
-extension URL: @retroactive Identifiable {
+extension URL: Identifiable {
     public var id: URL { self }
 }

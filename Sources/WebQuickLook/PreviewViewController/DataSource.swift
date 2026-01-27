@@ -21,6 +21,7 @@ extension PreviewViewController: QLPreviewControllerDataSource {
         case .success(let url):
             return url as QLPreviewItem
         case .failure(let error):
+            // when showing this errors right now it's hard to tell which file has failed and in case of default why it has failed
             switch error {
             case let error as WebQuickLookError :
                 return error.makeFile() as QLPreviewItem
