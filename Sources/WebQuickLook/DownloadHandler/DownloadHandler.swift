@@ -8,14 +8,14 @@
 import Foundation
 import QuickLook
 
-internal let directoryURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
-fileprivate let plistURL: URL = directoryURL.appendingPathComponent("mapping.plist")
-internal let defaultMessageDirectoryURL = directoryURL.appendingPathComponent("defaultFiles")
-internal let demoDirectoryURL = directoryURL.appendingPathComponent("demoFiles")
+internal let webQLPreviewBaseURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
+fileprivate let plistURL: URL = webQLPreviewBaseURL.appendingPathComponent("mapping.plist")
+internal let defaultMessageDirectoryURL = webQLPreviewBaseURL.appendingPathComponent("defaultFiles")
+internal let demoDirectoryURL = webQLPreviewBaseURL.appendingPathComponent("demoFiles")
 
 internal final class DownloadHandler {
     private init() {
-        try? fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        try? fileManager.createDirectory(at: webQLPreviewBaseURL, withIntermediateDirectories: true)
         try? fileManager.createDirectory(at: defaultMessageDirectoryURL, withIntermediateDirectories: true)
         try? fileManager.createDirectory(at: demoDirectoryURL, withIntermediateDirectories: true)
         mapping = .init(dictionary: Self.loadMappingFromDisk(plistURL: plistURL))
@@ -46,7 +46,7 @@ internal extension DownloadHandler {
 //                }
                 
                 if let fileName = await self.mapping[url] {
-                    let fileURL = directoryURL.appendingPathComponent(fileName)
+                    let fileURL = webQLPreviewBaseURL.appendingPathComponent(fileName)
                     if self.fileManager.fileExists(atPath: fileURL.path) {
                         await completion(ind, .success(fileURL))
                         continue
@@ -55,7 +55,12 @@ internal extension DownloadHandler {
                 
                 group.addTask {
                     do {
-                        let localURL = try await self.Download(url)
+                        let (localURL, name) = try await withCheckedThrowingContinuation { cont in
+                            let task = URLSession.shared.dataTask(with: url)
+                            task.delegate = DownloadDelegate(continuation: cont, defaultName: url.lastPathComponent)
+                            task.resume()
+                        }
+                        await self.mapping.set(name, for: url)
                         await completion(ind, .success(localURL))
                     } catch {
                         print(error)
@@ -69,7 +74,7 @@ internal extension DownloadHandler {
     
     // TODO: - make this function accessible to the user
     func deleteAll() throws {
-        let contents = try fileManager.contentsOfDirectory(at: directoryURL, includingPropertiesForKeys: nil)
+        let contents = try fileManager.contentsOfDirectory(at: webQLPreviewBaseURL, includingPropertiesForKeys: nil)
         
         let preservedURLs = [defaultMessageDirectoryURL, demoDirectoryURL]
         
@@ -98,28 +103,6 @@ private extension DownloadHandler {
         } catch {
             return false
         }
-    }
-    
-    
-    func Download(_ remoteURL: URL) async throws -> URL {
-        let (data, name) = try await withCheckedThrowingContinuation { cont in
-            let task = URLSession.shared.dataTask(with: remoteURL)
-            task.delegate = DownloadDelegate(continuation: cont)
-            task.resume()
-        }
-        
-        let directoryName = UUID().uuidString
-        let fileName = name ?? remoteURL.lastPathComponent
-        
-        let directoryPath = directoryURL.appendingPathComponent(directoryName)
-        let filePath = directoryPath.appendingPathComponent(fileName)
-        
-        try self.fileManager.createDirectory(at: directoryPath, withIntermediateDirectories: true)
-        try data.write(to: filePath)
-        
-        await self.mapping.set(directoryName + "/" + fileName, for: remoteURL)
-        
-        return filePath
     }
 }
 
