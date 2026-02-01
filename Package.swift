@@ -14,11 +14,17 @@ let package = Package(
             name: "WebQuickLook",
             targets: ["WebQuickLook"]),
     ],
+    dependencies: [
+//        .package(name: "RemoteResourceKit", path: "../RemoteResourceKit")
+        .package(url: "https://github.com/manthan127/RemoteResourceKit.git", branch: "main"),
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "WebQuickLook"),
+            name: "WebQuickLook",
+            dependencies: ["RemoteResourceKit"]
+        ),
         .testTarget(
             name: "WebQuickLookTests",
             dependencies: ["WebQuickLook"]),

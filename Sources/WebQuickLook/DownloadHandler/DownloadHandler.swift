@@ -7,6 +7,7 @@
 
 import Foundation
 import QuickLook
+import RemoteResourceKit
 
 internal let webQLPreviewBaseURL = FileManager.default.temporaryDirectory.appendingPathComponent("WebQLPreview")
 fileprivate let plistURL: URL = webQLPreviewBaseURL.appendingPathComponent("mapping.plist")
@@ -32,40 +33,33 @@ internal extension DownloadHandler {
     func downloadFiles(from urls: [URL], completion: @escaping ([Int], DownloadResult) async -> ()) async {
         // grouping the same urls
         var dic: [URL: [Int]] = [:]
-        for (ind, url) in (urls).enumerated() {
+        for (ind, url) in urls.enumerated() {
             dic[url, default: []].append(ind)
         }
         
         await withTaskGroup(of: Void.self) { group in
-            for (url, ind) in dic {
-//                if !url.pathExtension.isEmpty {
-                    guard canPreview(ext: url.pathExtension) else {
-                        await completion(ind, .failure(WebQuickLookError.invalidFileType))
-                        continue
-                    }
-//                }
+            for (url, indices) in dic {
+                //if !url.pathExtension.isEmpty {
+                guard canPreview(ext: url.pathExtension) else {
+                    await completion(indices, .failure(WebQuickLookError.invalidFileType))
+                    continue
+                }
+                //}
                 
+                // TODO: - not checking properly for already downloaded files
                 if let fileName = await self.mapping[url] {
                     let fileURL = webQLPreviewBaseURL.appendingPathComponent(fileName)
                     if self.fileManager.fileExists(atPath: fileURL.path) {
-                        await completion(ind, .success(fileURL))
+                        await completion(indices, .success(fileURL))
                         continue
                     }
                 }
                 
+                let resourceGroup = makeResourceGroup(url: url, indices: indices, completion: completion)
                 group.addTask {
-                    do {
-                        let (localURL, name) = try await withCheckedThrowingContinuation { cont in
-                            let task = URLSession.shared.dataTask(with: url)
-                            task.delegate = DownloadDelegate(continuation: cont, defaultName: url.lastPathComponent)
-                            task.resume()
-                        }
-                        await self.mapping.set(name, for: url)
-                        await completion(ind, .success(localURL))
-                    } catch {
-                        print(error)
-                        await completion(ind, .failure(error))
-                    }
+                    let downloadSession = DownloadSession()
+                    downloadSession.delegate = self
+                    await downloadSession.download(resourceGroup)
                 }
             }
         }
@@ -91,7 +85,34 @@ internal extension DownloadHandler {
     }
 }
 
+extension DownloadHandler: DownloadSessionDelegate {
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse) async throws -> URLSession.ResponseDisposition {
+        let isCanceled = response.expectedContentLength > WebQuickLook.config.maxFileSize
+        if isCanceled {
+            throw WebQuickLookError.bigFile
+        }
+        return .becomeDownload
+    }
+}
+
 private extension DownloadHandler {
+    func makeResourceGroup(url: URL, indices: [Int], completion: @escaping ([Int], DownloadResult) async -> ()) -> ResourceGroup {
+        ResourceGroup(baseURL: webQLPreviewBaseURL) {
+            let id = UUID().uuidString
+            Folder(name: id) {
+                File(name: nil, url: url)
+                    .onDownloadComplete { localURL in
+                        let name = id + "/" + localURL.lastPathComponent
+                        await self.mapping.set(name, for: url)
+                        await completion(indices, .success(localURL))
+                    }
+                    .onError { error in
+                        await completion(indices, .failure(error))
+                    }
+            }
+        }
+    }
+    
     func canPreview(ext: String) -> Bool {
         let url = demoDirectoryURL.appendingPathComponent("demo."+ext)
         

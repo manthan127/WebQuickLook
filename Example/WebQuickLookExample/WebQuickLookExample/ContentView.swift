@@ -10,7 +10,7 @@ import WebQuickLook
 
 struct ContentView: View {
     init() {
-        WebQuickLook.config.maxFileSize = 20 * 1024
+        WebQuickLook.config.maxFileSize = 5 * 1024 * 1024
     }
     var body: some View {
         QuickLookPreview(
