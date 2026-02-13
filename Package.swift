@@ -7,7 +7,7 @@ let package = Package(
     name: "WebQuickLook",
     // using iOS 15 because diving delegate to individual task is only available after iOs 15
     // can support previous version if we use delegate in the settion object
-    platforms: [.iOS(.v15)], 
+    platforms: [.iOS(.v15), .macOS(.v12)], 
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -15,8 +15,8 @@ let package = Package(
             targets: ["WebQuickLook"]),
     ],
     dependencies: [
-//        .package(name: "RemoteResourceKit", path: "../RemoteResourceKit")
-        .package(url: "https://github.com/manthan127/RemoteResourceKit.git", branch: "main"),
+        .package(name: "RemoteResourceKit", path: "../RemoteResourceKit")
+//        .package(url: "https://github.com/manthan127/RemoteResourceKit.git", branch: "main"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

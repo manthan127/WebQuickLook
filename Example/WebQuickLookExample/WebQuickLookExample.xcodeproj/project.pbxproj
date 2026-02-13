@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F45594782F3F79C20009DF90 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F45594772F3F79C20009DF90 /* Preview Assets.xcassets */; };
+		F455947D2F3F79DD0009DF90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86AF2F06CE540045F03A /* Assets.xcassets */; };
+		F45594802F3F7A190009DF90 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48F86AD2F06CE530045F03A /* ContentView.swift */; };
+		F45594812F3F7A190009DF90 /* WebQuickLookExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48F86AB2F06CE530045F03A /* WebQuickLookExampleApp.swift */; };
+		F45594842F3F7A330009DF90 /* WebQuickLook in Frameworks */ = {isa = PBXBuildFile; productRef = F45594832F3F7A330009DF90 /* WebQuickLook */; };
 		F48F86AC2F06CE530045F03A /* WebQuickLookExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48F86AB2F06CE530045F03A /* WebQuickLookExampleApp.swift */; };
 		F48F86AE2F06CE530045F03A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F48F86AD2F06CE530045F03A /* ContentView.swift */; };
 		F48F86B02F06CE540045F03A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F48F86AF2F06CE540045F03A /* Assets.xcassets */; };
@@ -18,6 +23,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F455946E2F3F79C00009DF90 /* macOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = macOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F45594772F3F79C20009DF90 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		F45594792F3F79C20009DF90 /* macOSExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOSExample.entitlements; sourceTree = "<group>"; };
 		F48F86A82F06CE530045F03A /* WebQuickLookExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WebQuickLookExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F48F86AB2F06CE530045F03A /* WebQuickLookExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebQuickLookExampleApp.swift; sourceTree = "<group>"; };
 		F48F86AD2F06CE530045F03A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -27,6 +35,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F455946B2F3F79C00009DF90 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F45594842F3F7A330009DF90 /* WebQuickLook in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F48F86A52F06CE530045F03A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -41,11 +57,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F455946F2F3F79C00009DF90 /* macOSExample */ = {
+			isa = PBXGroup;
+			children = (
+				F45594792F3F79C20009DF90 /* macOSExample.entitlements */,
+				F45594762F3F79C20009DF90 /* Preview Content */,
+			);
+			path = macOSExample;
+			sourceTree = "<group>";
+		};
+		F45594762F3F79C20009DF90 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				F45594772F3F79C20009DF90 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		F45594822F3F7A330009DF90 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F48F869F2F06CE530045F03A = {
 			isa = PBXGroup;
 			children = (
 				F48F86AA2F06CE530045F03A /* WebQuickLookExample */,
+				F455946F2F3F79C00009DF90 /* macOSExample */,
 				F48F86A92F06CE530045F03A /* Products */,
+				F45594822F3F7A330009DF90 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -53,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				F48F86A82F06CE530045F03A /* WebQuickLookExample.app */,
+				F455946E2F3F79C00009DF90 /* macOSExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,6 +123,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F455946D2F3F79C00009DF90 /* macOSExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F455947C2F3F79C20009DF90 /* Build configuration list for PBXNativeTarget "macOSExample" */;
+			buildPhases = (
+				F455946A2F3F79C00009DF90 /* Sources */,
+				F455946B2F3F79C00009DF90 /* Frameworks */,
+				F455946C2F3F79C00009DF90 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = macOSExample;
+			packageProductDependencies = (
+				F45594832F3F7A330009DF90 /* WebQuickLook */,
+			);
+			productName = macOSExample;
+			productReference = F455946E2F3F79C00009DF90 /* macOSExample.app */;
+			productType = "com.apple.product-type.application";
+		};
 		F48F86A72F06CE530045F03A /* WebQuickLookExample */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F48F86B62F06CE540045F03A /* Build configuration list for PBXNativeTarget "WebQuickLookExample" */;
@@ -113,6 +176,9 @@
 				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1530;
 				TargetAttributes = {
+					F455946D2F3F79C00009DF90 = {
+						CreatedOnToolsVersion = 15.3;
+					};
 					F48F86A72F06CE530045F03A = {
 						CreatedOnToolsVersion = 15.3;
 					};
@@ -134,11 +200,21 @@
 			projectRoot = "";
 			targets = (
 				F48F86A72F06CE530045F03A /* WebQuickLookExample */,
+				F455946D2F3F79C00009DF90 /* macOSExample */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F455946C2F3F79C00009DF90 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F45594782F3F79C20009DF90 /* Preview Assets.xcassets in Resources */,
+				F455947D2F3F79DD0009DF90 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F48F86A62F06CE530045F03A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -151,6 +227,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F455946A2F3F79C00009DF90 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F45594802F3F7A190009DF90 /* ContentView.swift in Sources */,
+				F45594812F3F7A190009DF90 /* WebQuickLookExampleApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F48F86A42F06CE530045F03A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -163,6 +248,66 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		F455947A2F3F79C20009DF90 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOSExample/macOSExample.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"macOSExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.macOSExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F455947B2F3F79C20009DF90 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOSExample/macOSExample.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"macOSExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.test.macOSExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		F48F86B42F06CE540045F03A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -287,9 +432,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WebQuickLookExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -304,6 +450,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.WebQuickLookExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -315,9 +462,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"WebQuickLookExample/Preview Content\"";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -332,6 +480,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.WebQuickLookExample;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -341,6 +490,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F455947C2F3F79C20009DF90 /* Build configuration list for PBXNativeTarget "macOSExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F455947A2F3F79C20009DF90 /* Debug */,
+				F455947B2F3F79C20009DF90 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F48F86A32F06CE530045F03A /* Build configuration list for PBXProject "WebQuickLookExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -362,6 +520,10 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		F45594832F3F7A330009DF90 /* WebQuickLook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WebQuickLook;
+		};
 		F494BFFF2F0979E300F313F7 /* WebQuickLook */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = WebQuickLook;

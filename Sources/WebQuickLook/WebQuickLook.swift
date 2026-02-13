@@ -54,7 +54,7 @@ public enum WebQuickLook {
 }
 
 public struct Config {
-    public var maxFileSize: Int64 = 5 * 1024 * 1024
+    public var maxFileSize: Int64?
     
     public var downloading: URL?
     public var downloadFailed: URL?

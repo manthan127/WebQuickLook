@@ -86,12 +86,11 @@ internal extension DownloadHandler {
 }
 
 extension DownloadHandler: DownloadSessionDelegate {
-    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse) async throws -> URLSession.ResponseDisposition {
-        let isCanceled = response.expectedContentLength > WebQuickLook.config.maxFileSize
-        if isCanceled {
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse) async throws -> ResponseDisposition {
+        if let maxFileSize = WebQuickLook.config.maxFileSize, response.expectedContentLength > maxFileSize {
             throw WebQuickLookError.bigFile
         }
-        return .becomeDownload
+        return .allow
     }
 }
 
@@ -120,7 +119,11 @@ private extension DownloadHandler {
             if !fileManager.fileExists(atPath: url.path) {
                 try Data().write(to: url)
             }
+            #if canImport(UIKit)
             return QLPreviewController.canPreview(url as QLPreviewItem)
+            #else
+            return true
+            #endif
         } catch {
             return false
         }

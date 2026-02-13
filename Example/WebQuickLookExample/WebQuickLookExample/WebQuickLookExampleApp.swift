@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+// TODO: add tvOS, visionOS functionality
 @main
 struct WebQuickLookExampleApp: App {
     var body: some Scene {

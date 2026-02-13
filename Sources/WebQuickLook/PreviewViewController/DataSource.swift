@@ -5,6 +5,7 @@
 //  Created by Home on 04/01/26.
 //
 
+#if canImport(UIKit)
 import QuickLook
 
 extension PreviewViewController: QLPreviewControllerDataSource {
@@ -14,30 +15,16 @@ extension PreviewViewController: QLPreviewControllerDataSource {
     
     public func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
         guard index < resources.count, let result = resources[index].result else {
-            return callingAPIURL() as QLPreviewItem
+            return URL.callingAPIURL() as QLPreviewItem
         }
         
         switch result {
         case .success(let url):
             return url as QLPreviewItem
         case .failure(let error):
+            return error.previewItem as QLPreviewItem
             // when showing this errors right now it's hard to tell which file has failed and in case of default why it has failed
-            switch error {
-            case let error as WebQuickLookError :
-                return error.makeFile() as QLPreviewItem
-            default:
-                return failURL() as QLPreviewItem
-            }
         }
     }
 }
-
-private extension PreviewViewController {
-    func failURL() -> URL {
-        WebQuickLook.config.downloadFailed ?? WebQuickLook.makeFile(name: "error", text: "Failed to load file.")
-    }
-    
-    func callingAPIURL() -> URL {
-        WebQuickLook.config.downloading ?? WebQuickLook.makeFile(name: "processing", text: "API is Being Called")
-    }
-}
+#endif

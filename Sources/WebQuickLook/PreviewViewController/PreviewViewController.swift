@@ -5,8 +5,9 @@
 //  Created by Home on 15/06/25.
 //
 
-import UIKit
 import QuickLook
+#if canImport(UIKit)
+import UIKit
 
 struct RemoteResource {
     let remoteURL: URL
@@ -33,16 +34,16 @@ public class PreviewViewController: QLPreviewController {
 //        delegate = self
         
         downloadTask = Task {
-            await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { indices, res in
+            await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { indices, result in
                 await MainActor.run {
                     for ind in indices {
-                        self.resources[ind].result = res
+                        self.resources[ind].result = result
                     }
                     self.reloadData()
                 }
             }
         }
-    
+        
 //        if self.navigationItem.rightBarButtonItem == nil {
 //            let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(dismissPreview))
 //            self.navigationItem.rightBarButtonItem = doneButton
@@ -56,3 +57,4 @@ public class PreviewViewController: QLPreviewController {
 
 // TODO: - implement delegate methods
 //extension PreviewViewController: QLPreviewControllerDelegate {}
+#endif
