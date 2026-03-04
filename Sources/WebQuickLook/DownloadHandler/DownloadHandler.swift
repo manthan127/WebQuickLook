@@ -102,11 +102,15 @@ private extension DownloadHandler {
                 File(name: nil, url: url)
                     .onDownloadComplete { localURL in
                         let name = id + "/" + localURL.lastPathComponent
-                        await self.mapping.set(name, for: url)
-                        await completion(indices, .success(localURL))
+                        Task {
+                            await self.mapping.set(name, for: url)
+                            await completion(indices, .success(localURL))
+                        }
                     }
                     .onError { error in
-                        await completion(indices, .failure(error))
+                        Task {
+                            await completion(indices, .failure(error))
+                        }
                     }
             }
         }
