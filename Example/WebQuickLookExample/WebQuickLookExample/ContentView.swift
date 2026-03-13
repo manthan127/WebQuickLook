@@ -13,26 +13,28 @@ struct ContentView: View {
 //        WebQuickLook.config.maxFileSize = 5 * 1024 * 1024
     }
     @State private var url: URL?
+    
+    let urls = [
+        "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz",
+        "https://download.blender.org/demo/2_big_buck_bunny_v2.pdf",
+        "https://download.blender.org/demo/BlenderIconsSet_v1.0.penpot",
+        "https://download.blender.org/demo/greasepencil-bike.blend",
+        "https://fastly.picsum.photos/id/866/800/600.jpg?hmac=ABydLIy9SfKp2C562ssO9GKtL4uss8xHHILcBin8K48",
+        "https://loremflickr.com/cache/resized/defaultImage.small_800_600_nofilter.jpg",
+        "https://www.gstatic.com/webp/gallery/1.sm.webp",
+        "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        "https://www.africau.edu/images/default/sample.pdf",
+        "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf",
+    ].compactMap{URL(string: $0)}
+    
     var body: some View {
         Button("Open") {
-            url = URL(string: "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz")
-//            url = URL(string: "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf")
+            url = urls[0]
         }
-        .webQuickLookPreview($url)
-//        QuickLookPreview(
-//            urls: [
-//                "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz",// not showing preview
-//                "https://download.blender.org/demo/2_big_buck_bunny_v2.pdf",
-//                "https://download.blender.org/demo/BlenderIconsSet_v1.0.penpot",
-//                "https://download.blender.org/demo/greasepencil-bike.blend",
-//                "https://fastly.picsum.photos/id/866/800/600.jpg?hmac=ABydLIy9SfKp2C562ssO9GKtL4uss8xHHILcBin8K48",
-//                "https://loremflickr.com/cache/resized/defaultImage.small_800_600_nofilter.jpg",
-//                "https://www.gstatic.com/webp/gallery/1.sm.webp",
-//                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-//                "https://www.africau.edu/images/default/sample.pdf",
-//                "https://unec.edu.az/application/uploads/2014/12/pdf-sample.pdf",
-//            ].compactMap{URL(string: $0)}
-//        )
+        .quickLookPreview($url, in: urls)
+//        .webQuickLookPreview($url)//, in: urls)
+        
+//        QuickLookPreview(urls: urls)
     }
 }
 

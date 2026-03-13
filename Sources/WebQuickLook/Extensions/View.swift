@@ -8,7 +8,7 @@ extension View {
             .modifier(WebQuicklookModifier(item: item))
     }
     
-    public func webQuickLookPreview<Items>(_ selection: Binding<Items.Element?>, in items: Items) -> some View where Items : RandomAccessCollection, Items.Element == URL {
+    public func webQuickLookPreview(_ selection: Binding<URL?>, in items: [URL]) -> some View {
         self
             .modifier(WebQuicklookModifierArr(selection: selection, items: items))
     }
@@ -33,47 +33,81 @@ struct WebQuicklookModifier: ViewModifier {
                     item = nil
                 }
             }
-            .onChange(of: item) { newValue in //
-                print("Volume changed from \(item) to \(newValue)")
-                guard let item = item else {return}
-                Task {
-                    self.url = URL.callingAPIURL()
-                    await DownloadHandler.shared.downloadFiles(from: [item]) { indices, downloadResult in
-                        switch downloadResult {
-                        case .success(let url):
-                            self.url = url
-                        case .failure(let error):
-                            self.url = error.previewItem
-                        }
-                    }
+            .onChange(of: item, perform: userChangedURL(_ :))
+    }
+    
+    func userChangedURL(_ newValue: URL?) {
+        guard let item = newValue else {return}
+        Task {
+            self.url = URL.callingAPIURL()
+            await DownloadHandler.shared.downloadFiles(from: [item]) { _, downloadResult in
+                switch downloadResult {
+                case .success(let url):
+                    self.url = url
+                    print("----", url)
+                case .failure(let error):
+                    self.url = error.previewItem
                 }
-                // You can perform side effects here, like saving data or updating a model.
             }
+        }
     }
 }
 
-struct WebQuicklookModifierArr<Items: RandomAccessCollection>: ViewModifier where Items.Element == URL {
-    @Binding var selection: Items.Element?
-    let items: Items
+struct WebQuicklookModifierArr: ViewModifier {
+    @Binding var selection: URL?
+    let items: [URL]
     
-    @State var url: URL?
-    let urls: [URL]
+    @State private var url: URL?
+    @State private var urls: [URL]
     
-    init(selection: Binding<Items.Element?>, items: Items) {
+    init(selection: Binding<URL?>, items: [URL]) {
         self._selection = selection
         self.items = items
         
-        url = nil
+        // start calling api
+        if selection.wrappedValue != nil {
+            self.url = URL.callingAPIURL()
+        }
         urls = Array(repeating: URL.callingAPIURL(), count: items.count)
     }
     
     func body(content: Content) -> some View {
         content
             .quickLookPreview($selection, in: items)
-            .onChange(of: selection) { oldValue in
-                if let selection {
-                    items.firstIndex(of: selection)
+            .onChange(of: selection, perform: userChangedSelection(_:))
+    }
+    
+    // stop work of previous api call before calling new api for download
+    // TODO: - need to load urls lazily
+    private func userChangedSelection(_ newValue: URL?) {
+        Task {
+            self.url = URL.callingAPIURL()
+            await DownloadHandler.shared.downloadFiles(from: items) { indices, result in
+                await MainActor.run {
+                    switch result {
+                    case .success(let url):
+//                        let selectedInd = items.
+                        for ind in indices {
+                            self.urls[ind] = url
+                        }
+                    case .failure(let error):
+                        for ind in indices {
+                            self.urls[ind] = error.failURL()
+                        }
+                    }
                 }
             }
+//            await DownloadHandler.shared.downloadFiles(from: [selection]) { indices, downloadResult in
+//                guard indices.contains(selectedInd) else { return }
+//                switch downloadResult {
+//                case .success(let url):
+//                    self.url = url
+//                    self.urls[selectedInd] = url
+//                case .failure(let error):
+//                    self.url = error.previewItem
+//                    self.urls[selectedInd] = error.previewItem
+//                }
+//            }
+        }
     }
 }

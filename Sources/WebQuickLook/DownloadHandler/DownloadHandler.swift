@@ -23,6 +23,7 @@ internal final class DownloadHandler {
     }
     public static let shared = DownloadHandler()
     
+    // TODO: - not working as expected
     /// In-memory mapping: remoteURL → filename
     private var mapping: ActorDictionary<URL, String>
     

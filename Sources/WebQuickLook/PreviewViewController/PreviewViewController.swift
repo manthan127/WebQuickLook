@@ -15,6 +15,7 @@ struct RemoteResource {
 }
 
 // TODO: add option for lazy loading of files or load all at once
+// TODO: - need to load urls lazily
 public class PreviewViewController: QLPreviewController {
     internal var resources: [RemoteResource] = []
     
