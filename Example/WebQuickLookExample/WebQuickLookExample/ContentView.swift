@@ -15,10 +15,10 @@ struct ContentView: View {
     @State private var url: URL?
     
     let urls = [
-        "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz",
+//        "https://developer.apple.com/augmented-reality/quick-look/models/hummingbird/hummingbird_anim.usdz",
         "https://download.blender.org/demo/2_big_buck_bunny_v2.pdf",
-        "https://download.blender.org/demo/BlenderIconsSet_v1.0.penpot",
-        "https://download.blender.org/demo/greasepencil-bike.blend",
+//        "https://download.blender.org/demo/BlenderIconsSet_v1.0.penpot",
+//        "https://download.blender.org/demo/greasepencil-bike.blend",
         "https://fastly.picsum.photos/id/866/800/600.jpg?hmac=ABydLIy9SfKp2C562ssO9GKtL4uss8xHHILcBin8K48",
         "https://loremflickr.com/cache/resized/defaultImage.small_800_600_nofilter.jpg",
         "https://www.gstatic.com/webp/gallery/1.sm.webp",
@@ -30,9 +30,12 @@ struct ContentView: View {
     var body: some View {
         Button("Open") {
             url = urls[0]
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+//                self.url = urls[1]
+//            }
         }
-        .quickLookPreview($url, in: urls)
-//        .webQuickLookPreview($url)//, in: urls)
+//        .quickLookPreview($url, in: urls)
+        .webQuickLookPreview($url, in: urls)
         
 //        QuickLookPreview(urls: urls)
     }

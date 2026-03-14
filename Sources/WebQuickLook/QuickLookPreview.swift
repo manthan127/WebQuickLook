@@ -5,7 +5,6 @@
 //  Created by Home on 15/06/25.
 //
 
-#if canImport(UIKit)
 import SwiftUI
 
 public struct QuickLookPreview: UIViewControllerRepresentable {
@@ -27,5 +26,3 @@ public struct QuickLookPreview: UIViewControllerRepresentable {
 #Preview(body: {
     QuickLookPreview(urls: [URL(string: "")].compactMap({$0}))
 })
-
-#endif

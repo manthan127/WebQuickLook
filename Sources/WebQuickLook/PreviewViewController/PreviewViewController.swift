@@ -6,7 +6,6 @@
 //
 
 import QuickLook
-#if canImport(UIKit)
 import UIKit
 
 struct RemoteResource {
@@ -58,4 +57,3 @@ public class PreviewViewController: QLPreviewController {
 
 // TODO: - implement delegate methods
 //extension PreviewViewController: QLPreviewControllerDelegate {}
-#endif

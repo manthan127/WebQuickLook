@@ -5,7 +5,6 @@
 //  Created by Home on 04/01/26.
 //
 
-#if canImport(UIKit)
 import QuickLook
 
 extension PreviewViewController: QLPreviewControllerDataSource {
@@ -27,4 +26,3 @@ extension PreviewViewController: QLPreviewControllerDataSource {
         }
     }
 }
-#endif

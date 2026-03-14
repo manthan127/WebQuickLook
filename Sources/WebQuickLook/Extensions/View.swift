@@ -73,7 +73,7 @@ struct WebQuicklookModifierArr: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .quickLookPreview($selection, in: items)
+            .quickLookPreview($url, in: urls)
             .onChange(of: selection, perform: userChangedSelection(_:))
     }
     
@@ -86,11 +86,16 @@ struct WebQuicklookModifierArr: ViewModifier {
                 await MainActor.run {
                     switch result {
                     case .success(let url):
-//                        let selectedInd = items.
+                        if let ind = items.firstIndex(where: { $0 == selection}), indices.contains(ind) {
+                            self.url = url
+                        }
                         for ind in indices {
                             self.urls[ind] = url
                         }
                     case .failure(let error):
+                        if let ind = items.firstIndex(where: { $0 == selection}), indices.contains(ind) {
+                            self.url = error.failURL()
+                        }
                         for ind in indices {
                             self.urls[ind] = error.failURL()
                         }

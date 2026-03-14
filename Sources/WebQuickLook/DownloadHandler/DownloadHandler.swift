@@ -124,11 +124,7 @@ private extension DownloadHandler {
             if !fileManager.fileExists(atPath: url.path) {
                 try Data().write(to: url)
             }
-            #if canImport(UIKit)
             return QLPreviewController.canPreview(url as QLPreviewItem)
-            #else
-            return true
-            #endif
         } catch {
             return false
         }
