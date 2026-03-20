@@ -60,7 +60,11 @@ internal extension DownloadHandler {
                 group.addTask {
                     let downloadSession = DownloadSession()
                     downloadSession.delegate = self
-                    await downloadSession.download(resourceGroup)
+                    do {
+                        try await downloadSession.download(resourceGroup)
+                    } catch {
+                        //only trigged if their is duplicate local urls, or user cancels the download
+                    }
                 }
             }
         }

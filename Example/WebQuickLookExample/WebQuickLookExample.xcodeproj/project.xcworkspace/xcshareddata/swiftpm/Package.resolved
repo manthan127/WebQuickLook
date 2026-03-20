@@ -1,13 +1,13 @@
 {
-  "originHash" : "9a6f58def176b13a4d93eb780d00284de4eff579712da356feffdd8f5a63671a",
+  "originHash" : "2979e98b1b8fe995747451362d9b8b98665e9621a72ab13cbbdc05299a267885",
   "pins" : [
     {
       "identity" : "remoteresourcekit",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/manthan127/RemoteResourceKit.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "72d0bddb437c2ca96c528796686833d7553e5a88"
+        "revision" : "9951bdca963a380e586f46f9b8a03987cb8d7ec4",
+        "version" : "0.0.0"
       }
     }
   ],

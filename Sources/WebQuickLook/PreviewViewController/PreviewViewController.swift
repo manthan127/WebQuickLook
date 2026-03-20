@@ -31,7 +31,7 @@ public class PreviewViewController: QLPreviewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         dataSource = self
-//        delegate = self
+        delegate = self
         
         downloadTask = Task {
             await DownloadHandler.shared.downloadFiles(from: resources.map(\.remoteURL)) { indices, result in
@@ -54,6 +54,3 @@ public class PreviewViewController: QLPreviewController {
 //        self.dismiss(animated: true, completion: nil)
 //    }
 }
-
-// TODO: - implement delegate methods
-//extension PreviewViewController: QLPreviewControllerDelegate {}
